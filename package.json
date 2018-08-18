@@ -1,0 +1,46 @@
+{
+  "name": "single-number-input-vue",
+  "version": "1.0.0",
+  "description": "number input using single char",
+  "main": "dist/singleNumberInput.umd.js",
+  "module": "dist/singleNumberInput.esm.js",
+  "unpkg": "dist/singleNumberInput.min.js",
+  "browser": {
+    "./sfc": "src/singleNumberInput.vue"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build:umd && npm run build:es && npm run build:unpkg",
+    "build:umd": "./node_modules/rollup/bin/rollup -c build/rollup.config.js --format umd --file dist/singleNumberInput.umd.js",
+    "build:es": "./node_modules/rollup/bin/rollup -c build/rollup.config.js --format es --file dist/singleNumberInput.esm.js",
+    "build:unpkg": "./node_modules/rollup/bin/rollup -c build/rollup.config.js --format iife --file dist/singleNumberInput.min.js"
+    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MuffinK/single-number-input-vue.git"
+  },
+  "keywords": [
+    "vue",
+    "html5",
+    "number-input"
+  ],
+  "author": "jinxz_k@live.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MuffinK/single-number-input-vue/issues"
+  },
+  "homepage": "https://github.com/MuffinK/single-number-input-vue#readme",
+  "dependencies": {
+    "vue": "^2.5.17",
+    "vue-property-decorator": "^7.0.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.64.1",
+    "rollup-plugin-buble": "^0.19.2",
+    "rollup-plugin-typescript2": "^0.16.1",
+    "rollup-plugin-vue": "^4.3.2",
+    "typescript": "^3.0.1",
+    "vue-template-compiler": "^2.5.17"
+  }
+}
