@@ -7,7 +7,8 @@
 <script lang="ts">
 
 import Vue from "vue";
-import { Component, Prop, Watch } from 'vue-property-decorator';
+import {Component, Prop, Watch} from 'vue-property-decorator';
+// import Component from 'vue-class-component';
 
 class NumberString {
   value = '';
@@ -35,8 +36,7 @@ class NumberString {
     }
   }
 }
-@Component({
-})
+@Component({})
 export default class SingleNumberInput extends Vue {
   displayString = '';
   widthStyle = {
