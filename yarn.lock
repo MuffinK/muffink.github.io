@@ -642,6 +642,10 @@ rollup-plugin-node-resolve@^3.3.0:
     is-module "^1.0.0"
     resolve "^1.1.6"
 
+rollup-plugin-typescript-path-mapping@^1.0.2:
+  version "1.0.2"
+  resolved "http://registry.npm.taobao.org/rollup-plugin-typescript-path-mapping/download/rollup-plugin-typescript-path-mapping-1.0.2.tgz#e4675930866cb9d45a491421b1d546817f9e3921"
+
 rollup-plugin-typescript2@^0.16.1:
   version "0.16.1"
   resolved "http://registry.npm.taobao.org/rollup-plugin-typescript2/download/rollup-plugin-typescript2-0.16.1.tgz#72e1f8a2e450550eabdc3d474e735feae322b474"
