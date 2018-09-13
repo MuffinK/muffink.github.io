@@ -10,15 +10,15 @@
 </head>
 <body>
   <div id="app">
-    <single-input-number v-module="value">
-    </single-input-number>
+    <single-number-input v-model="value" ch-number=6 >
+    </single-number-input>
     result: {{value}}
   </div>
   <script>
     new Vue({
       el: "#app",
       data: {
-        'value': '1'
+        'value': ''
       },
       components: {
         'single-input-number': 'single-input-number'

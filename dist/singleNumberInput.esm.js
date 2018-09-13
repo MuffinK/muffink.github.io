@@ -41,11 +41,6 @@ function isPrimitive(value) {
     var type = typeof value;
     return value == null || (type !== "object" && type !== "function");
 }
-function warn(message) {
-    if (typeof console !== 'undefined') {
-        console.warn('[vue-class-component] ' + message);
-    }
-}
 
 function collectDataFromConstructor(vm, Component) {
     // override _init to prevent to init as Vue instance
@@ -83,12 +78,6 @@ function collectDataFromConstructor(vm, Component) {
             plainData[key] = data[key];
         }
     });
-    if (process.env.NODE_ENV !== 'production') {
-        if (!(Component.prototype instanceof Vue) && Object.keys(plainData).length > 0) {
-            warn('Component class must inherit Vue or its descendant class ' +
-                'when class property is used.');
-        }
-    }
     return plainData;
 }
 
@@ -154,21 +143,6 @@ function componentFactory(Component, options) {
     forwardStaticMembers(Extended, Component, Super);
     return Extended;
 }
-var reservedPropertyNames = [
-    // Unique id
-    'cid',
-    // Super Vue constructor
-    'super',
-    // Component options that will be used by the component
-    'options',
-    'superOptions',
-    'extendOptions',
-    'sealedOptions',
-    // Private assets
-    'component',
-    'directive',
-    'filter'
-];
 function forwardStaticMembers(Extended, Original, Super) {
     // We have to use getOwnPropertyNames since Babel registers methods as non-enumerable
     Object.getOwnPropertyNames(Original).forEach(function (key) {
@@ -203,13 +177,6 @@ function forwardStaticMembers(Extended, Original, Super) {
                 return;
             }
         }
-        // Warn if the users manually declare reserved properties
-        if (process.env.NODE_ENV !== 'production'
-            && reservedPropertyNames.indexOf(key) >= 0) {
-            warn("Static property name '" + key + "' declared on class '" + Original.name + "' " +
-                'conflicts with reserved property name of Vue internal. ' +
-                'It may cause unexpected behavior of the component. Consider renaming the property.');
-        }
         Object.defineProperty(Extended, key, descriptor);
     });
 }
@@ -243,7 +210,6 @@ function Prop(options) {
     });
 }
 
-// import Component from 'vue-class-component';
 var NumberString = function NumberString(maxLength) {
     this.value = '';
     this.maxLength = maxLength || 4;
@@ -258,7 +224,10 @@ NumberString.prototype.pop = function pop () {
         this.value = this.value.slice(0, -1);
     }
 };
-NumberString.prototype.getDisplayString = function getDisplayString () {
+NumberString.prototype.getDisplayString = function getDisplayString (password) {
+    if (password) {
+        return new Array(this.value.length).fill('*').join('').padEnd(this.maxLength, ' ').split('').join('|');
+    }
     return this.value.padEnd(this.maxLength, ' ').split('').join('|');
 };
 NumberString.prototype.setValue = function setValue (inputNumber) {
@@ -281,19 +250,19 @@ var SingleNumberInput = (function (Vue$$1) {
     SingleNumberInput.prototype.mounted = function mounted () {
         this.stringValue = new NumberString(Number(this.chNumber));
         this.stringValue.setValue(this.value);
-        this.displayString = this.stringValue.getDisplayString();
+        this.displayString = this.stringValue.getDisplayString(this.password);
         this.widthStyle.width = Number(this.chNumber) * 4 + 'ch';
     };
     SingleNumberInput.prototype.keydown = function keydown (event) {
         var numberValue = '0123456789'.indexOf(event.key);
         if (numberValue !== -1) {
             this.stringValue.push(event.key);
-            this.displayString = this.stringValue.getDisplayString();
+            this.displayString = this.stringValue.getDisplayString(this.password);
             this.$emit('input', this.stringValue.value);
         }
         else if (event.key === "Backspace") {
             this.stringValue.pop();
-            this.displayString = this.stringValue.getDisplayString();
+            this.displayString = this.stringValue.getDisplayString(this.password);
             this.$emit('input', this.stringValue.value);
         }
         event.cancelBubble = true;
@@ -305,6 +274,9 @@ var SingleNumberInput = (function (Vue$$1) {
 __decorate([
     Prop()
 ], SingleNumberInput.prototype, "chNumber", void 0);
+__decorate([
+    Prop()
+], SingleNumberInput.prototype, "password", void 0);
 __decorate([
     Prop()
 ], SingleNumberInput.prototype, "value", void 0);
@@ -352,11 +324,11 @@ __vue_render__._withStripped = true;
   /* style */
   var __vue_inject_styles__ = function (inject) {
     if (!inject) { return }
-    inject("data-v-ceba03e8_0", { source: "\ninput[data-v-ceba03e8]{\n  background: transparent;\n  border: black solid 1px;\n  text-align: center;\n  border-radius: 5px;\n  font-size: xx-large;\n  letter-spacing: 1ch;\n  text-indent: 1ch;\n  font-family: monospace;\n  color: transparent;\n  text-shadow: 0 0 0 #000;\n}\n", map: {"version":3,"sources":["/Users/muffin/workspace/single-number-input-vue/src/singleNumberInput.vue"],"names":[],"mappings":";AAwEA;EACA,wBAAA;EACA,wBAAA;EACA,mBAAA;EACA,mBAAA;EACA,oBAAA;EACA,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,mBAAA;EACA,wBAAA;CACA","file":"singleNumberInput.vue","sourcesContent":["<template>\n  <div>\n    <input type=\"text\" v-model=\"displayString\" :style=\"widthStyle\" @keydown=\"keydown\">\n  </div>\n</template>\n\n<script lang=\"ts\">\n\nimport Vue from \"vue\";\nimport {Component, Prop, Watch} from 'vue-property-decorator';\n// import Component from 'vue-class-component';\n\nclass NumberString {\n  value = '';\n  maxLength: number;\n\n  constructor(maxLength: number){\n    this.maxLength = maxLength || 4;\n  }\n  push(char: string){\n    if(this.value.length < this.maxLength && char.length === 1){\n      this.value = [this.value, char].join('');\n    }\n  }\n  pop(){\n   if(this.value.length !== 0){\n     this.value = this.value.slice(0, -1);\n   } \n  }\n  getDisplayString(){\n    return this.value.padEnd(this.maxLength, ' ').split('').join('|');\n  }\n  setValue(inputNumber: string){\n    if(inputNumber.length>= this.maxLength && !isNaN(parseInt(inputNumber))){\n      this.value = inputNumber;\n    }\n  }\n}\n@Component({})\nexport default class SingleNumberInput extends Vue {\n  displayString = '';\n  widthStyle = {\n    width: '16ch'\n  }\n  @Prop() private chNumber!: string;\n  stringValue! : NumberString;\n  @Prop() value!: string;\n  mounted() {\n    this.stringValue = new NumberString(Number(this.chNumber));\n    this.stringValue.setValue(this.value);\n    this.displayString = this.stringValue.getDisplayString();\n    this.widthStyle.width = Number(this.chNumber) * 4 + 'ch';\n  }\n\n  keydown(event: KeyboardEvent){\n    let numberValue = '0123456789'.indexOf(event.key);\n    if(numberValue !== -1){\n      this.stringValue.push(event.key);\n      this.displayString = this.stringValue.getDisplayString();\n      this.$emit('input', this.stringValue.value);\n    }else if(event.key === \"Backspace\"){\n      this.stringValue.pop()\n      this.displayString = this.stringValue.getDisplayString();\n      this.$emit('input', this.stringValue.value);\n    }\n    event.cancelBubble = true;\n    event.preventDefault();\n  }\n}\n</script>\n\n<style scoped>\n  input{\n    background: transparent;\n    border: black solid 1px;\n    text-align: center;\n    border-radius: 5px;\n    font-size: xx-large;\n    letter-spacing: 1ch;\n    text-indent: 1ch;\n    font-family: monospace;\n    color: transparent;\n    text-shadow: 0 0 0 #000;\n  }\n</style>\n\n"]}, media: undefined });
+    inject("data-v-70028fc6_0", { source: "\ninput[data-v-70028fc6]{\n  background: transparent;\n  border: black solid 1px;\n  text-align: center;\n  border-radius: 5px;\n  font-size: xx-large;\n  letter-spacing: 1ch;\n  text-indent: 1ch;\n  font-family: monospace;\n  color: transparent;\n  text-shadow: 0 0 0 #000;\n}\n", map: {"version":3,"sources":["/Users/muffin/workspace/single-number-input-vue/src/singleNumberInput.vue"],"names":[],"mappings":";AA2EA;EACA,wBAAA;EACA,wBAAA;EACA,mBAAA;EACA,mBAAA;EACA,oBAAA;EACA,oBAAA;EACA,iBAAA;EACA,uBAAA;EACA,mBAAA;EACA,wBAAA;CACA","file":"singleNumberInput.vue","sourcesContent":["<template>\n  <div>\n    <input type=\"text\" v-model=\"displayString\" :style=\"widthStyle\" @keydown=\"keydown\">\n  </div>\n</template>\n\n<script lang=\"ts\">\n\nimport Vue from \"vue\";\nimport {Component, Prop, Watch} from 'vue-property-decorator';\n\nclass NumberString {\n  value = '';\n  maxLength: number;\n\n  constructor(maxLength: number){\n    this.maxLength = maxLength || 4;\n  }\n  push(char: string){\n    if(this.value.length < this.maxLength && char.length === 1){\n      this.value = [this.value, char].join('');\n    }\n  }\n  pop(){\n   if(this.value.length !== 0){\n     this.value = this.value.slice(0, -1);\n   } \n  }\n  getDisplayString(password: boolean){\n    if(password){\n      return new Array(this.value.length).fill('*').join('').padEnd(this.maxLength, ' ').split('').join('|');\n    }\n    return this.value.padEnd(this.maxLength, ' ').split('').join('|');\n  }\n  setValue(inputNumber: string){\n    if(inputNumber.length>= this.maxLength && !isNaN(parseInt(inputNumber))){\n      this.value = inputNumber;\n    }\n  }\n}\n@Component({})\nexport default class SingleNumberInput extends Vue {\n  displayString = '';\n  widthStyle = {\n    width: '16ch'\n  }\n  @Prop() private chNumber!: string;\n  @Prop() private password!: boolean;\n  stringValue! : NumberString;\n  @Prop() value!: string;\n  mounted() {\n    this.stringValue = new NumberString(Number(this.chNumber));\n    this.stringValue.setValue(this.value);\n    this.displayString = this.stringValue.getDisplayString(this.password);\n    this.widthStyle.width = Number(this.chNumber) * 4 + 'ch';\n  }\n\n  keydown(event: KeyboardEvent){\n    let numberValue = '0123456789'.indexOf(event.key);\n    if(numberValue !== -1){\n      this.stringValue.push(event.key);\n      this.displayString = this.stringValue.getDisplayString(this.password);\n      this.$emit('input', this.stringValue.value);\n    }else if(event.key === \"Backspace\"){\n      this.stringValue.pop()\n      this.displayString = this.stringValue.getDisplayString(this.password);\n      this.$emit('input', this.stringValue.value);\n    }\n    event.cancelBubble = true;\n    event.preventDefault();\n  }\n}\n</script>\n\n<style scoped>\n  input{\n    background: transparent;\n    border: black solid 1px;\n    text-align: center;\n    border-radius: 5px;\n    font-size: xx-large;\n    letter-spacing: 1ch;\n    text-indent: 1ch;\n    font-family: monospace;\n    color: transparent;\n    text-shadow: 0 0 0 #000;\n  }\n</style>\n\n"]}, media: undefined });
 
   };
   /* scoped */
-  var __vue_scope_id__ = "data-v-ceba03e8";
+  var __vue_scope_id__ = "data-v-70028fc6";
   /* module identifier */
   var __vue_module_identifier__ = undefined;
   /* functional template */
@@ -505,5 +477,5 @@ if (GlobalVue) {
 	GlobalVue.use(plugin);
 }
 
-export default component;
+export default SingleNumberInput$1;
 export { install };

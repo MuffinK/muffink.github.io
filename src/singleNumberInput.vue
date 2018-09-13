@@ -8,7 +8,6 @@
 
 import Vue from "vue";
 import {Component, Prop, Watch} from 'vue-property-decorator';
-// import Component from 'vue-class-component';
 
 class NumberString {
   value = '';
@@ -27,7 +26,10 @@ class NumberString {
      this.value = this.value.slice(0, -1);
    } 
   }
-  getDisplayString(){
+  getDisplayString(password: boolean){
+    if(password){
+      return new Array(this.value.length).fill('*').join('').padEnd(this.maxLength, ' ').split('').join('|');
+    }
     return this.value.padEnd(this.maxLength, ' ').split('').join('|');
   }
   setValue(inputNumber: string){
@@ -43,12 +45,13 @@ export default class SingleNumberInput extends Vue {
     width: '16ch'
   }
   @Prop() private chNumber!: string;
+  @Prop() private password!: boolean;
   stringValue! : NumberString;
   @Prop() value!: string;
   mounted() {
     this.stringValue = new NumberString(Number(this.chNumber));
     this.stringValue.setValue(this.value);
-    this.displayString = this.stringValue.getDisplayString();
+    this.displayString = this.stringValue.getDisplayString(this.password);
     this.widthStyle.width = Number(this.chNumber) * 4 + 'ch';
   }
 
@@ -56,11 +59,11 @@ export default class SingleNumberInput extends Vue {
     let numberValue = '0123456789'.indexOf(event.key);
     if(numberValue !== -1){
       this.stringValue.push(event.key);
-      this.displayString = this.stringValue.getDisplayString();
+      this.displayString = this.stringValue.getDisplayString(this.password);
       this.$emit('input', this.stringValue.value);
     }else if(event.key === "Backspace"){
       this.stringValue.pop()
-      this.displayString = this.stringValue.getDisplayString();
+      this.displayString = this.stringValue.getDisplayString(this.password);
       this.$emit('input', this.stringValue.value);
     }
     event.cancelBubble = true;
