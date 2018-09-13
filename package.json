@@ -1,6 +1,6 @@
 {
   "name": "single-number-input-vue",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "number input using single char",
   "main": "dist/singleNumberInput.umd.js",
   "module": "dist/singleNumberInput.esm.js",
