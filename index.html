@@ -13,12 +13,16 @@
     <single-number-input v-model="value" ch-number=6 >
     </single-number-input>
     result: {{value}}
+    <single-number-input v-model="value2" ch-number=6 password=true>
+    </single-number-input>
+    result: {{value2}}
   </div>
   <script>
     new Vue({
       el: "#app",
       data: {
-        'value': ''
+        'value': '',
+        'value2': ''
       },
       components: {
         'single-input-number': 'single-input-number'
